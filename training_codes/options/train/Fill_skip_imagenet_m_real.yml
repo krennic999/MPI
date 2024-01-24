@@ -1,0 +1,113 @@
+# ------------------------------------------------------------------------
+# Copyright (c) 2022 megvii-model. All Rights Reserved.
+# ------------------------------------------------------------------------
+# Modified from BasicSR (https://github.com/xinntao/BasicSR)
+# Copyright 2018-2020 BasicSR Authors
+# ------------------------------------------------------------------------
+# general settings
+name: Fill-clean_maskpretrain-m-real
+model_type: ImageRestorationMaskPretrainModel
+scale: 1
+num_gpu: 2
+manual_seed: 10
+
+datasets:
+  train:
+    name: Imagenet
+    type: ImageNetDataset
+    dataroot_gt: /data3/mxx/datasets/Imagenet/Imagenet/
+    dataroot_lq: /data3/mxx/datasets/Imagenet/Imagenet/
+
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+    gt_size: 256  #patch size
+    noise: False
+    sigma: 0
+    use_flip: false
+    use_rot: false
+
+    # data loader
+    use_shuffle: true
+    num_worker_per_gpu: 4
+    batch_size_per_gpu: 32
+    dataset_enlarge_ratio: 1
+    prefetch_mode: ~
+
+  val:
+    name: Imagenet_val
+    type: ImageNetDataset
+    dataroot_gt: /data3/mxx/datasets/Imagenet/Imagenet_val_tmp/
+    dataroot_lq: /data3/mxx/datasets/Imagenet/Imagenet_val_tmp/
+    io_backend:
+      type: disk
+
+    noise: False
+    sigma: 0
+
+network_g:
+  type: Fill_network
+  in_chans: 3
+  mask_ratio: [80,95]
+  multchannel: false
+  patchsz: 1
+  network: skip
+
+# path
+path:
+  pretrain_network_g: ~
+  strict_load_g: false
+  resume_state: ~
+
+# training settings
+train:
+  optim_g:
+    type: AdamW
+    lr: !!float 2e-3
+    weight_decay: 0.
+    betas: [0.9, 0.9]
+
+  scheduler:
+    type: TrueCosineAnnealingLR
+    T_max: 80000
+    eta_min: !!float 1e-5
+
+  total_iter: 80000 #200000
+  warmup_iter: -1 # no warm up
+
+  # losses
+  pixel_opt:
+    type: PSNRLoss
+    loss_weight: 1
+    reduction: mean
+
+# validation settings
+val:
+  val_freq: !!float 2e4
+  save_img: true
+  use_image: false
+
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 0
+      test_y_channel: false
+    ssim:
+      type: calculate_ssim
+      crop_border: 0
+      test_y_channel: false
+
+# logging settings
+logger:
+  print_freq: 200
+  save_checkpoint_freq: !!float 5e3
+  use_tb_logger: true
+  wandb:
+    project: ~
+    resume_id: ~
+
+# dist training settings
+dist_params:
+  backend: nccl
+  port: 29500
