@@ -13,9 +13,9 @@ Here is the list of libraries you need to install to execute the code:
 
 ## Run
 
-* Run the 'example_denoise.ipynb' directly.
+* Run the "example_denoise.ipynb" directly.
 
-* For evaluation on full dataset, run 'eval_syn.py' or 'eval_real.py'
+* For evaluation on full dataset, run "eval_syn.py" or "eval_real.py"
 
 * Example in jupyter is tested on a Nvidia RTX 3090 GPU
 
@@ -45,23 +45,23 @@ python -m torch.distributed.launch --nproc_per_node=8 --master_port=4321 basicsr
 ## About Different settings
 Training options in ./training_codes/options/train/:
 
-* In yml file 'Fill_skip_imagenet_m_syn.yml', 'skip' is the network architecture ('unet', 'resnet', 'dncnn' optional)
+* In yml file "Fill_skip_imagenet_m_syn.yml", "skip" is the network architecture ("unet", "resnet", "dncnn" optional)
 
-* 'syn' and 'real' are two different masking settings for synthetic noise and real noise (spatially correlated and spatially uncorrelated)
+* "syn" and "real" are two different masking settings for synthetic noise and real noise (spatially correlated and spatially uncorrelated)
 
 * For example:
     | Name                        | Explanation                     | Masking Settings                      |
     |-----------------------------|---------------------------------|---------------------------------------|
-    | Fill_skip_imagenet_m_syn    | 'skip' architecture, synthetic  | mask_ratio=30, multchannel=True       |
-    | Fill_skip_imagenet_m_real   | 'skip' architecture, real       | mask_ratio=[80,95], multchannel=False |
+    | Fill_skip_imagenet_m_syn    | "skip" architecture, synthetic  | mask_ratio=30, multchannel=True       |
+    | Fill_skip_imagenet_m_real   | "skip" architecture, real       | mask_ratio=[80,95], multchannel=False |
 
 * For Inference options in ./configs/:
     | Name          | Explanation                | Masking Settings                                           |
     |---------------|----------------------------|------------------------------------------------------------|
-    | Fill_m_syn    | For all synthetic noise    | NUM_ITER=1000,EXP_WEIGHT=0.99,MASK_ratio=[30,30],SHUFFLE=1 |
-    | Fill_m_sidd   | For SIDD dataset           | NUM_ITER=800,EXP_WEIGHT=0.99,MASK_ratio=[90,90],SHUFFLE=2  |
-    | Fill_m_polyu  | For PolyU and FMD dataset  | NUM_ITER=1000,EXP_WEIGHT=0.99,MASK_ratio=[85,85],SHUFFLE=1 |
-    | Fill_s_syn    | For all synthetic noise    | NUM_ITER=200,EXP_WEIGHT=0.90,MASK_ratio=[30,30],SHUFFLE=1  |
-    | Fill_s_sidd   | For SIDD dataset           | NUM_ITER=200,EXP_WEIGHT=0.90,MASK_ratio=[90,90],SHUFFLE=2  |
-    | Fill_s_polyu  | For PolyU and FMD dataset  | NUM_ITER=200,EXP_WEIGHT=0.90,MASK_ratio=[85,85],SHUFFLE=1  |
+    | Fill_m_syn    | For all synthetic noise    | num_iter=1000,exp_weight=0.99,mask_ratio=[30,30],shuffle=1 |
+    | Fill_m_sidd   | For SIDD dataset           | num_iter=800,exp_weight=0.99,mask_ratio=[90,90],shuffle=2  |
+    | Fill_m_polyu  | For PolyU and FMD dataset  | num_iter=1000,exp_weight=0.99,mask_ratio=[85,85],shuffle=1 |
+    | Fill_s_syn    | For all synthetic noise    | num_iter=200,exp_weight=0.90,mask_ratio=[30,30],shuffle=1  |
+    | Fill_s_sidd   | For SIDD dataset           | num_iter=200,exp_weight=0.90,mask_ratio=[90,90],shuffle=2  |
+    | Fill_s_polyu  | For PolyU and FMD dataset  | num_iter=200,exp_weight=0.90,mask_ratio=[85,85],shuffle=1  |
 
