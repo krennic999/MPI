@@ -1,0 +1,15 @@
+
+modelpath: ./ckpts/imgnet_30_multchannel_m.pth
+
+LR: 0.002
+
+OPTIMIZER: adam
+show_every: 10
+load_initial: 'noisy' # 'noisy' or 'none'
+EXP_WEIGHT: 0.99
+
+NUM_ITER: 1000
+INPUT_DEPTH: 3
+IS_SMOOTH: True
+
+mask_ratio: [30,30]
