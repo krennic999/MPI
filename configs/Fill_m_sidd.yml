@@ -1,0 +1,26 @@
+imsize: -1
+plot: False
+save_inter: False
+
+input:  noise  #  meshgrid 
+pad:  reflection 
+
+modelpath: ./ckpts/imgnet_80_95_singlechannel_skip.pth
+# or: ./ckpts/architectures/imgnet_30_multchannel_dncnn.pth
+# or: ./ckpts/architectures/imgnet_30_multchannel_resnet.pth
+# or: ./ckpts/architectures/imgnet_30_multchannel_unet.pth
+
+lr: 0.002
+
+optimizer: adam
+show_every: 10
+load_initial: 'noisy'
+ensemble_mode: 'exp'
+exp_weight: 0.99
+
+shuffle: 2
+num_iter: 800
+input_depth: 3
+is_smooth: True
+
+mask_ratio: [90,90]
