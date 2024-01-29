@@ -65,3 +65,4 @@ Training options in ./training_codes/options/train/:
     | Fill_s_sidd   | For SIDD dataset           | num_iter=200,exp_weight=0.90,mask_ratio=[90,90],shuffle=2  |
     | Fill_s_polyu  | For PolyU and FMD dataset  | num_iter=200,exp_weight=0.90,mask_ratio=[85,85],shuffle=1  |
 
+## Still organizing！！！ Feel free to ask any questions!!!
