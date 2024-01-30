@@ -49,7 +49,7 @@ python -m torch.distributed.launch --nproc_per_node=8 --master_port=4321 basicsr
 
 Metrics in paper tested on a Nvidia RTX 3090 GPU
 
-* Extensive experimental results on SIDD & DND benchmark:
+* Additional experimental results on SIDD & DND benchmark:
     | Version     | β    | SIDD Validation | SIDD Benchmark | DND Benchmark |
     |-------------|------|-----------------|----------------|---------------|
     | MPI (faster)| 0.90 | 33.69/0.828     | 33.60/0.896    | 35.40/0.909   |
