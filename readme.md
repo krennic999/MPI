@@ -55,7 +55,7 @@ Training options in ./training_codes/options/train/:
     | Fill_skip_imagenet_m_syn    | "skip" architecture, synthetic  | mask_ratio=30, multchannel=True       |
     | Fill_skip_imagenet_m_real   | "skip" architecture, real       | mask_ratio=[80,95], multchannel=False |
 
-* For Inference options in ./configs/:
+For Inference options in ./configs/:
     | Name          | Explanation                | Masking Settings                                           |
     |---------------|----------------------------|------------------------------------------------------------|
     | Fill_m_syn    | For all synthetic noise    | num_iter=1000,exp_weight=0.99,mask_ratio=[30,30],shuffle=1 |
