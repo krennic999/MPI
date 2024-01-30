@@ -3,33 +3,38 @@ import torch.nn as nn
 import numpy as np
 import random
 import torch.nn.functional as F
-from math import ceil
+from .resnet import ResNet
+from .unet import UNet
+from .dncnn import DnCNN
 
 
-class Fill_skip(nn.Module):
-    def __init__(self,in_chans=3,mask_ratio=[30,30],mode='normal',
-                 multchannel=True,patchsz=1,dropout_p=0):
-        super(Fill_skip, self).__init__()
+class Fill_network(nn.Module):
+    def __init__(self,in_chans=3,mask_ratio=[30,30],
+                 multchannel=True,patchsz=1,network='skip'):
+        super(Fill_network, self).__init__()
         self.in_chans=in_chans
         self.multchannel=multchannel
         self.mask_ratio=mask_ratio
         self.patchsz=patchsz
-        layer_num=5 if mode=='normal' else 2
-        embed_dim=64 if mode=='normal' else 16
-        skip_dim=64 if mode=='normal' else 16
-        self.net=skip(self.in_chans*2 if self.multchannel else self.in_chans+1,
-                      self.in_chans,dropout_p=dropout_p,num=layer_num,
-                      embed_dim=embed_dim,skip_dim=skip_dim)
-        
+        if network=='skip':
+            self.net=skip(self.in_chans*2 if self.multchannel else self.in_chans+1,self.in_chans)
+        elif network=='unet':
+            self.net=UNet(self.in_chans*2 if self.multchannel else self.in_chans+1,self.in_chans)
+        elif network=='dncnn':
+            self.net=DnCNN(in_channels=self.in_chans*2 if self.multchannel else self.in_chans+1,
+                out_channels=self.in_chans)
+        elif network=='resnet':
+            self.net=ResNet(self.in_chans*2 if self.multchannel else self.in_chans+1,self.in_chans)
 
     def add_input_mask(self,img):
+        '''return:seq_masked:(b,c,t,h,w);  mask:(b,c,h,w)'''
+
         B,C,H,W=img.shape
-        size_=(B,self.in_chans if self.multchannel else 1,ceil(H/self.patchsz),ceil(W/self.patchsz))
+        size_=(B,self.in_chans if self.multchannel else 1,H//self.patchsz,W//self.patchsz)
         prob = random.randint(self.mask_ratio[0],self.mask_ratio[1]) / 100
-
         mask = np.random.choice([0, 1], size=size_, p=[prob, 1 - prob])
-        self.mask = F.interpolate(torch.from_numpy(mask).to(img.device),scale_factor=self.patchsz,mode='nearest')
-
+        # self.mask = F.interpolate(torch.from_numpy(mask).to(img.device),scale_factor=self.patchsz,mode='nearest')
+        self.mask = torch.from_numpy(mask).to(img.device)
         img_masked=torch.mul(img,self.mask)
         return img_masked,self.mask
     
@@ -45,10 +50,8 @@ class Fill_skip(nn.Module):
 def skip(
         num_input_channels=3, num_output_channels=3, dropout_p=0,
         filter_size_down=3, filter_size_up=3, filter_skip_size=1,
-        need_sigmoid=True, need_bias=True, embed_dim=64,skip_dim=64,num=5,
-        # pad='zero', upsample_mode='nearest', downsample_mode='stride', act_fun='LeakyReLU', 
-        pad='reflection', upsample_mode='nearest', downsample_mode='stride', act_fun='LeakyReLU',
-        # pad='reflection', upsample_mode='bilinear', downsample_mode='avg', act_fun='LeakyReLU',#目前试出来最好的一组
+        need_sigmoid=True, need_bias=True, embed_dim=64,skip_dim=64,num_layers=5,
+        pad='reflection', upsample_mode='nearest', downsample_mode='stride', act_fun='LeakyReLU', 
         need1x1_up=True):
     """Assembles encoder-decoder with skip connections.
 
@@ -59,7 +62,7 @@ def skip(
         downsample_mode (string): 'stride|avg|max|lanczos2' (default: 'stride')
 
     """
-    num_channels_down=[embed_dim]*num;num_channels_up=[embed_dim]*num;num_channels_skip=[skip_dim]*num
+    num_channels_down=[embed_dim]*num_layers;num_channels_up=[embed_dim]*num_layers;num_channels_skip=[skip_dim]*num_layers
     
     assert len(num_channels_down) == len(num_channels_up) == len(num_channels_skip)
 
@@ -149,7 +152,7 @@ def add_module(self, module):
     
 torch.nn.Module.add = add_module
 
-class Concat(nn.Module):#skip,deeper
+class Concat(nn.Module):
     def __init__(self, dim, *args):
         super(Concat, self).__init__()
         self.dim = dim
@@ -379,11 +382,3 @@ def get_kernel(factor, kernel_type, phase, kernel_width, support=None, sigma=Non
     kernel /= kernel.sum()
     
     return kernel
-
-
-if __name__ == "__main__":
-    model_fill=skip()
-    print(model_fill)
-    inp=torch.rand([1,3,512,512])
-    out=model_fill(inp)
-    print(out.shape)

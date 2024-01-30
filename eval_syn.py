@@ -1,33 +1,20 @@
 from __future__ import print_function
 
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '5'
+os.environ['CUDA_VISIBLE_DEVICES'] = '4'
 device = 'cuda'
 
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
-from torch.optim import Adam,lr_scheduler
-import random
-from dataset import add_noise_torch,Get_Dataset
-from util import compare_psnr,get_args,get_model,test,tensor2plot,write_logs
-from models.Fill_network_arch import Fill_network
+from torch.optim import Adam
+from utils.dataset_util import Get_Dataset
+from utils.metrics import compare_psnr,test
+from utils.util import get_args,get_model,write_logs
+from utils.smooth_util import smooth_out_withmask
 from PIL import Image
 import time
 from torch.utils.data import DataLoader
-
-
-def smooth_out_withmask(out_avg,out,mask,exp_weight=0.99):
-    # Smoothing
-    if out_avg is None:
-        out_avg = torch.div(torch.mul(out.detach(),1-mask).sum(dim=0,keepdim=True),torch.sum(1-mask,dim=0,keepdim=True))
-        out_avg=torch.where(torch.isnan(out_avg),torch.full_like(out_avg,0),out_avg)
-    else:
-        out_ = torch.div(torch.mul(out.detach(),1-mask).sum(dim=0,keepdim=True),torch.sum(1-mask,dim=0,keepdim=True))
-        mask_=torch.mean(1-mask.float(),dim=0,keepdim=True).ceil()
-        out_=torch.where(torch.isnan(out_),torch.full_like(out_,0),out_)
-        out_avg = (out_avg * exp_weight + out_ * (1 - exp_weight))*mask_+out_avg*(1-mask_)
-    return out_avg
 
 
 def eval(dataloader,args,sigma=0,savepath='./outputs'):
@@ -63,7 +50,7 @@ def eval(dataloader,args,sigma=0,savepath='./outputs'):
         
         write_logs(im_name+'   psnr= %.4f,   ssim= %.4f'%(psnr_out,ssim_out))
 
-        Image.fromarray((np.clip(out_avg_plt,0,1) * 255).astype(np.uint8))\
+        Image.fromarray(np.round((np.clip(out_avg_plt,0,1) * 255)).astype(np.uint8))\
                     .save(os.path.join(savepath,im_name.split('.')[0]+'_%.4f.png'%psnr_out))
         Image.fromarray((np.clip(img_noisy_torch.detach().cpu().numpy()[0].transpose(1,2,0),0,1)
                           * 255).astype(np.uint8))\
@@ -99,6 +86,8 @@ def train(args,data,net_fill,optimizer_fill,criterion_fill):
 
         if args.is_smooth:
             out_avg=smooth_out_withmask(out_avg,out,mask,exp_weight=args.exp_weight)
+        else:
+            out_avg=out.clone().detach()
 
         optimizer_fill.zero_grad()
         # noisy2noisy loss
@@ -111,7 +100,7 @@ def train(args,data,net_fill,optimizer_fill,criterion_fill):
             psnr_gt    = compare_psnr(torch.mul(img_gt_torch.detach(),1-mask), torch.mul(out.detach(),1-mask))
             psnr_gt_sm = compare_psnr(img_gt_torch.detach(), out_avg.detach()) if not out_avg==None else 0
             
-            print ('Iteration:%05d  PSNR_noisy: %f PSRN_gt: %f PSNR_gt_sm: %f' \
+            print ('Iteration:%05d  PSNR_noisy: %f PSNR_gt: %f PSNR_gt_sm: %f' \
                 % (iter+1, psnr_noisy, psnr_gt, psnr_gt_sm), '\r', end='')
             psnr_list.append(psnr_gt_sm)
             psnr_noisy_list.append(psnr_noisy)
