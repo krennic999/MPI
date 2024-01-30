@@ -83,12 +83,4 @@ Training options in ./training_codes/options/train/:
 
 
 ## Citation
-If you find our code or data helpful, please cite our paper:
-```bibtex
-@article{ma2024masked,
-  title={Masked Pre-trained Model Enables Universal Zero-shot Denoiser},
-  author={Xiaoxiao Ma and Zhixiang Wei and Yi Jin and Pengyang Ling and Tianle Liu and Ben Wang and Junkang Dai and Huaian Chen and Enhong Chen},
-  journal={arXiv preprint arXiv:2401.14966},
-  year={2024}
-}
-```
+If you find our code or data helpful, please cite our paper!
