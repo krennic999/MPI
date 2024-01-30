@@ -11,22 +11,16 @@ Here is the list of libraries you need to install to execute the code:
 - scikit-image = 0.21.0
 - jupyter
 
-## Run
-
-* Run the "example_denoise.ipynb" directly.
-
-* For evaluation on full dataset, run "eval_syn.py" or "eval_real.py"
-
-* Example in jupyter is tested on a Nvidia RTX 3090 GPU
 
 ## For Pre-train
 We choose 48,627 images from ImageNet validation dataset
 
 * First, download "ILSVRC2012_img_val.tar" from https://www.image-net.org/, and unzip
-* Then select images with shape larger than 256×256 using "./training_codes/data_gen.py",
+* Then select images with shape larger than 256×256 using ``./training_codes/data_gen.py``,
 * Your dataset path should be like:
 
-```ImageNet/
+```
+ImageNet
 ├── ILSVRC2012_val_00000001.JPEG
 ├── ILSVRC2012_val_00000002.JPEG
 └── ...
@@ -42,6 +36,28 @@ python -m torch.distributed.launch --nproc_per_node=8 --master_port=4321 basicsr
 
 * Copy the checkpoint for zero-shot inference
 
+
+## For Evaluation
+
+* For evaluation on synthetic noise, run ``eval_syn.py``
+
+* For evaluation on real-world images, run ``eval_real.py``
+
+* For evaluation on SIDD & DND benchmark, cd into eval_benchmarks, run ``sidd_denoise.py`` and ``dnd_denoise.py``
+
+* For a simple test version, run the ``example_denoise.ipynb`` directly (only supported synthetic noise).
+
+Metrics in paper tested on a Nvidia RTX 3090 GPU
+
+* Extensive experimental results on SIDD & DND benchmark:
+    | Version     | β    | SIDD Validation | SIDD Benchmark | DND Benchmark |
+    |-------------|------|-----------------|----------------|---------------|
+    | MPI (faster)| 0.90 | 33.69/0.828     | 33.60/0.896    | 35.40/0.909   |
+    | MPI         | 0.99 | 34.42/0.843     | 34.31/0.902    | 36.24/0.916   |
+
+* See our published results at https://www.eecs.yorku.ca/~kamel/sidd/benchmark.php and https://noise.visinf.tu-darmstadt.de/benchmark/
+
+
 ## About Different settings
 Training options in ./training_codes/options/train/:
 
@@ -55,9 +71,7 @@ Training options in ./training_codes/options/train/:
     | Fill_skip_imagenet_m_syn    | "skip" architecture, synthetic  | mask_ratio=30, multchannel=True       |
     | Fill_skip_imagenet_m_real   | "skip" architecture, real       | mask_ratio=[80,95], multchannel=False |
 
-For Inference options in ./configs/:
-
-* For example:
+* For Inference options in ./configs/:
     | Name          | Explanation                | Masking Settings                                           |
     |---------------|----------------------------|------------------------------------------------------------|
     | Fill_m_syn    | For all synthetic noise    | num_iter=1000,exp_weight=0.99,mask_ratio=[30,30],shuffle=1 |
@@ -67,4 +81,14 @@ For Inference options in ./configs/:
     | Fill_s_sidd   | For SIDD dataset           | num_iter=200,exp_weight=0.90,mask_ratio=[90,90],shuffle=2  |
     | Fill_s_polyu  | For PolyU and FMD dataset  | num_iter=200,exp_weight=0.90,mask_ratio=[85,85],shuffle=1  |
 
-## Still organizing！！！ Feel free to ask any questions!!!
+
+## Citation
+If you find our code or data helpful, please cite our paper:
+```bibtex
+@article{ma2024masked,
+  title={Masked Pre-trained Model Enables Universal Zero-shot Denoiser},
+  author={Xiaoxiao Ma and Zhixiang Wei and Yi Jin and Pengyang Ling and Tianle Liu and Ben Wang and Junkang Dai and Huaian Chen and Enhong Chen},
+  journal={arXiv preprint arXiv:2401.14966},
+  year={2024}
+}
+```
