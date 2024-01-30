@@ -55,7 +55,9 @@ Training options in ./training_codes/options/train/:
     | Fill_skip_imagenet_m_syn    | "skip" architecture, synthetic  | mask_ratio=30, multchannel=True       |
     | Fill_skip_imagenet_m_real   | "skip" architecture, real       | mask_ratio=[80,95], multchannel=False |
 
-* For Inference options in ./configs/:
+For Inference options in ./configs/:
+
+* For example:
     | Name          | Explanation                | Masking Settings                                           |
     |---------------|----------------------------|------------------------------------------------------------|
     | Fill_m_syn    | For all synthetic noise    | num_iter=1000,exp_weight=0.99,mask_ratio=[30,30],shuffle=1 |
@@ -65,3 +67,4 @@ Training options in ./training_codes/options/train/:
     | Fill_s_sidd   | For SIDD dataset           | num_iter=200,exp_weight=0.90,mask_ratio=[90,90],shuffle=2  |
     | Fill_s_polyu  | For PolyU and FMD dataset  | num_iter=200,exp_weight=0.90,mask_ratio=[85,85],shuffle=1  |
 
+## Still organizing！！！ Feel free to ask any questions!!!
