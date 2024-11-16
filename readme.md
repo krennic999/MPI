@@ -1,15 +1,34 @@
-### Masked Pre-trained Model Enables Universal Zero-shot Denoiser
+# Masked Pre-training Model Enables Universal Zero-shot Denoiser
 
-## Install
+Official PyTorch implementation of ["Masked Pre-training Model Enables Universal Zero-shot Denoiser"](https://arxiv.org/abs/2401.14966) in NeurIPS 2024.
 
-Here is the list of libraries you need to install to execute the code:
+![main_fig](./figs/model.svg)
+
+
+## Abstract
+In this work, we observe that model trained on vast general images via masking strategy, has been naturally embedded with their distribution knowledge, thus spontaneously attains the underlying potential for strong image denoising.
+Based on this observation, we propose a novel zero-shot denoising paradigm, i.e., Masked Pre-train then Iterative fill MPI.
+MPI first trains model via masking and then employs pre-trained weight for high-quality zero-shot image denoising on a single noisy image.
+Concretely, MPI comprises two key procedures:
+1) Masked Pre-training involves training model to reconstruct massive natural images with random masking for generalizable representations, gathering the potential for valid zero-shot denoising on images with varying noise degradation and even in distinct image types.
+2) Iterative filling exploits pre-trained knowledge for effective zero-shot denoising. It iteratively optimizes the image by leveraging pre-trained weights, focusing on alternate reconstruction of different image parts, and gradually assembles fully denoised image within limited number of iterations.
+Comprehensive experiments across various noisy scenarios underscore the notable advances of MPI over previous approaches with a marked reduction in inference time.
+
+
+---
+
+## Setup
+
+### Requirements
+
+Our experiments are done with:
+
 - python = 3.9.16
 - pytorch = 1.12.1+cu113
 - numpy = 1.25.0
 - matplotlib = 3.7.1
 - scikit-image = 0.21.0
 - jupyter
-
 
 ## For Pre-train
 We choose 48,627 images from ImageNet validation dataset
@@ -46,44 +65,33 @@ python -m torch.distributed.launch --nproc_per_node=8 --master_port=4321 basicsr
 
 * For a simple test version, run the ``example_denoise.ipynb`` directly (only supported synthetic noise).
 
-Metrics in paper tested on a Nvidia RTX 3090 GPU
+Metrics in paper are tested on Nvidia RTX 3090 GPUs
 
-* Additional experimental results on SIDD & DND benchmark:
-    | Version     | β    | SIDD Validation | SIDD Benchmark | DND Benchmark |
-    |-------------|------|-----------------|----------------|---------------|
-    | MPI (faster)| 0.90 | 33.69/0.828     | 33.60/0.896    | 35.40/0.909   |
-    | MPI         | 0.99 | 34.42/0.843     | 34.31/0.902    | 36.24/0.916   |
+## Results
 
-* See our published results at https://www.eecs.yorku.ca/~kamel/sidd/benchmark.php and https://noise.visinf.tu-darmstadt.de/benchmark/
+### Quantitative results
+
+Here is reported results of MPI. Please refer our paper for more detailed results.
+
+![results](./figs/results_gauss.png)
+
+With only ~10 seconds to exceed most recent methods!
+
+And can deal with multiple types of noise, refer our paper for more details.
+
+### Qualitative results
+
+Under gaussian noise:
+![visual](./figs/cases_gauss.svg)
+
+For real-world noisy images:
+![visual](./figs/cases_real.svg)
+
+### More results
 
 
-## About Different settings
-Training options in ./training_codes/options/train/:
 
-* In yml file "Fill_skip_imagenet_m_syn.yml", "skip" is the network architecture ("unet", "resnet", "dncnn" optional)
-
-* "syn" and "real" are two different masking settings for synthetic noise and real noise (spatially correlated and spatially uncorrelated)
-
-* For example:
-    | Name                        | Explanation                     | Masking Settings                      |
-    |-----------------------------|---------------------------------|---------------------------------------|
-    | Fill_skip_imagenet_m_syn    | "skip" architecture, synthetic  | mask_ratio=30, multchannel=True       |
-    | Fill_skip_imagenet_m_real   | "skip" architecture, real       | mask_ratio=[80,95], multchannel=False |
-
-* For Inference options in ./configs/:
-    | Name          | Explanation                | Masking Settings                                           |
-    |---------------|----------------------------|------------------------------------------------------------|
-    | Fill_m_syn    | For all synthetic noise    | num_iter=1000,exp_weight=0.99,mask_ratio=[30,30],shuffle=1 |
-    | Fill_m_sidd   | For SIDD dataset           | num_iter=800,exp_weight=0.99,mask_ratio=[90,90],shuffle=2  |
-    | Fill_m_polyu  | For PolyU and FMD dataset  | num_iter=1000,exp_weight=0.99,mask_ratio=[85,85],shuffle=1 |
-    | Fill_s_syn    | For all synthetic noise    | num_iter=200,exp_weight=0.90,mask_ratio=[30,30],shuffle=1  |
-    | Fill_s_sidd   | For SIDD dataset           | num_iter=200,exp_weight=0.90,mask_ratio=[90,90],shuffle=2  |
-    | Fill_s_polyu  | For PolyU and FMD dataset  | num_iter=200,exp_weight=0.90,mask_ratio=[85,85],shuffle=1  |
-
-## Possibly exist some bugs! Feel free to ask any questions!
-
-## Citation
-If you find our code or data helpful, please cite our paper!
+## Reference
 ```
 @article{ma2024masked,
   title={Masked Pre-trained Model Enables Universal Zero-shot Denoiser},
@@ -92,3 +100,11 @@ If you find our code or data helpful, please cite our paper!
   year={2024}
 }
 ```
+
+## Acknowledgement
+
+DIP
+
+BasicSR
+<!-- ---
+
