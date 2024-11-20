@@ -1,4 +1,4 @@
-# Masked Pre-training Model Enables Universal Zero-shot Denoiser
+# Masked Pre-training Enables Universal Zero-shot Denoiser
 
 Official PyTorch implementation of ["Masked Pre-training Model Enables Universal Zero-shot Denoiser"](https://arxiv.org/abs/2401.14966) in NeurIPS 2024.
 
@@ -93,11 +93,14 @@ For real-world noisy images:
 
 ## Reference
 ```
-@article{ma2024masked,
-  title={Masked Pre-trained Model Enables Universal Zero-shot Denoiser},
-  author={Ma, Xiaoxiao and Wei, Zhixiang and Jin, Yi and Ling, Pengyang and Liu, Tianle and Wang, Ben and Dai, Junkang and Chen, Huaian and Chen, Enhong},
-  journal={arXiv preprint arXiv:2401.14966},
-  year={2024}
+@misc{ma2024maskedpretrainingenablesuniversal,
+      title={Masked Pre-training Enables Universal Zero-shot Denoiser}, 
+      author={Xiaoxiao Ma and Zhixiang Wei and Yi Jin and Pengyang Ling and Tianle Liu and Ben Wang and Junkang Dai and Huaian Chen},
+      year={2024},
+      eprint={2401.14966},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2401.14966}, 
 }
 ```
 
